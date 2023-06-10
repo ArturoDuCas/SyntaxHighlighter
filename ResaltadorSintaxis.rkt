@@ -162,65 +162,66 @@
 (define (readLinePerSpaces line)
   (define (readLinePerSpaces_tr line word_ac isComment)
     (cond
-      [isComment 
-                    (if (> (string-length line) 0)
-                        (readLinePerSpaces_tr (removeFirstChar line) (string-append word_ac (getFirstChar line)) #t)
-                        (
-                         (token_writer word_ac)
-                         (write_break)
-                         )
-                     )
-                    
+      [ ; Si ya se detecto un comentario
+         isComment 
+          (if (> (string-length line) 0)
+            (
+              readLinePerSpaces_tr (removeFirstChar line) (string-append word_ac (getFirstChar line)) #t)
+            (
+              begin
+              (token_writer word_ac)
+              (write_break)
+            )
+         )
        ]
-      [#t  
-(if (> (string-length line) 0)
+
+      [ ; Casos normales
+        #t
+        (if (> (string-length line) 0)
          (
-          if (not (string=? (getFirstChar line) " "))
-                                            ( 
-                                              if (string=? (getFirstChar line) "#")
-                                                (begin
-                                                   (token_writer word_ac)
-                                                   (readLinePerSpaces_tr (removeFirstChar line) "#" #t)
-                                                 )
-                                                 (
-                                                     readLinePerSpaces_tr (removeFirstChar line) (string-append word_ac (getFirstChar line)) #f
-                                                  )
-                                             )
+            if (not (string=? (getFirstChar line) " "))
+              ( ; Si no se lee un espacio
+                if (string=? (getFirstChar line) "#")
+                  (
+                    begin
+                   (token_writer word_ac)
+                   (readLinePerSpaces_tr (removeFirstChar line) "#" #t)
+                  )
 
+                  (
+                    readLinePerSpaces_tr (removeFirstChar line) (string-append word_ac (getFirstChar line)) #f
+                  )
+              )
 
-                                       (begin ; Si el caracter es un espacio
-                                         (
-                                           if (> (string-length word_ac) 0)
-                                              ( ; Si el acumulador esta cargado
-                                                 begin 
-                                                 (token_writer word_ac)
-                                                 (write_space)
-                                               )
+              ( ; Si el caracter es un espacio
+                begin
+                (if (> (string-length word_ac) 0)
+                  ( ; Si el acumulador esta cargado
+                     begin
+                     (token_writer word_ac)
+                     (write_space)
+                  )
 
-                                              ( ; Si el acumulador no tiene nada
-                                                  write_space
-                                               )
-                                         )
+                  ( ; Si el acumulador no tiene nada
+                    write_space
+                  )
+                )
 
-                                         (readLinePerSpaces_tr (removeFirstChar line) "" #f)
-                                       )
-                                       )
-         
-                                       
-         (begin
-          (token_writer word_ac)
-          (write_break)
-          )
+                (readLinePerSpaces_tr (removeFirstChar line) "" #f)
+               )
+         )
 
-             )
-  ]
-      )
+         (
+           begin
+           (token_writer word_ac)
+           (write_break)
+         )
 
-    
+        )
+      ]
+    )
+  )
 
-
-
-          )
   (readLinePerSpaces_tr line "" #f)
 )
 
