@@ -1,4 +1,6 @@
-var = esto es un  ejemplo 
-4 + 4 = 123
-a = 3 - 3#Esto es un comentario
+var = esto es un  ejemplo "Como pueden observar"
+4 + 4 = 123"Estoy imprimiendo strings"
+a = 3 - 3#Esto es un comentario" Que divertido "
+" Espacio al inicio y al final " a = 3 + 3
+"String que no cierra alv!
 b = 4 + 5 # Esto es otro comentario
