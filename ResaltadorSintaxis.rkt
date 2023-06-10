@@ -120,6 +120,16 @@
   (write-tag token (token_evaluator token))
 )
 
+; Imprimir un salto de linea
+(define (write_break)
+  (write-text "<br>")
+  )
+
+; Imprimir un whitespace
+(define (write_space)
+  (write-text "<p>&nbsp&nbsp;<p>")
+  )
+
 
 
 
@@ -145,20 +155,9 @@
 
 ; Funcion recibe unstring y regresa un string del primer caracter
 (define (getFirstChar str)
-  (if (> (string-length str) 0)
       (string (string-ref str 0))
-      ""
-  )
   )
 
-
-(define (readLinePerSpacesXXX line)
-  (if (char=? (getFirstChar line) #\space)
-      (displayln "Espacio reconocido")
-      (displayln "Espacio no reconocido")
-
-      )
-  )
 
 (define (readLinePerSpaces line)
   (define (readLinePerSpaces_tr line word_ac)
@@ -170,14 +169,24 @@
                                              )
 
 
-                                       (begin ; Si el caracter es un espacio, despliega la palabra y sigue
-                                        (displayln word_ac)
+                                       (begin ; Si el caracter es un espacio
+                                         (displayln word_ac)
+                                         (if (> (string-length word_ac) 0)
+                                         (begin ; Si el acumulador esta cargado
+                                          (token_writer word_ac)
+                                          (write_space)
+                                          )
+                                         ( ; Si el acumulador no tiene nada
+                                          write_space
+                                          )
+                                         )
                                         (readLinePerSpaces_tr (removeFirstChar line) "")
-                                        )
                                        )
+                                       )
+                                       
          (begin
-          (displayln word_ac)
-          (displayln "CAMBIO DE LINEA")
+          (token_writer word_ac)
+          (write_break)
           )
 
 
@@ -190,19 +199,16 @@
 
 
 
+
+
+
+;Escribimos las reglas de css y las etiquetas de apertura de html
+(write-text (filestart))
+
+
 ; call-with-input-file -> procedimiento que toma dos argumentos: el nombre del archivo a abrir y la función a ejecutar. e encarga de abrir el archivo, pasar el objeto de archivo a la función y asegurarse de que el archivo se cierre adecuadamente una vez que se completa la ejecución de la función.
 (call-with-input-file "InputFile.txt" readFilePerLine)
 
 
-
-;; Ejemplo de uso
-;Escribimos las reglas de css y las etiquetas de apertura de html
-(write-text (filestart))
-;Aqui debería ir el analisis token por token del archivo
-(token_writer "#Esto es un comentario")
-(token_writer "\"Esto es un sring\"")
-(token_writer "variable_123")
-(token_writer "+")
-(token_writer "False")
 ;Escribimos las etiquetas de cierre de html
 (token_writer (fileclose))
