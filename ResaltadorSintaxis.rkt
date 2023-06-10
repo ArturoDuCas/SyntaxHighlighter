@@ -98,13 +98,13 @@
     (cond
       [(verificar-palabra-reservada? token) "reserved" ]
       [(regexp-match? #px"^[a-zA-Z][_a-zA-Z0-9]*$" token)  "var" ]
-      [(regexp-match? #px"^-?\\d+$" token)  "integer"]
-      [(regexp-match? #px"^[0-9]+\\.[0-9]*$" token) "float"]
+      [(regexp-match? #px"^-?\\d+$" token)  "literal"]
+      [(regexp-match? #px"^[0-9]+\\.[0-9]*$" token) "literal"]
       [(regexp-match? #px"^\".*\"$" token) "string"]
       [(regexp-match? #px"^\'.*\'$" token) "string"]
       [(regexp-match? #px"^#.*n*$" token) "comment"]
       [(regexp-match? #px"^[+\\-*//%=<>!&|^]$" token) "operator"]
-      [(regexp-match? #px"^[\\[\\]\\{\\}\\(\\)]+$" token) "delimeter"]
+      [(regexp-match? #px"^[\\[\\]\\{\\}\\(\\)]+$" token) "delimiter"]
       ["error"]
       ))
 
