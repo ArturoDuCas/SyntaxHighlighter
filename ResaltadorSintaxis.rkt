@@ -1,4 +1,6 @@
 #lang racket
+(require racket/base)
+(require racket/string)
 
 (define (verificar-palabra-reservada? str)
   (define palabras-reservadas
@@ -117,6 +119,79 @@
   
   (write-tag token (token_evaluator token))
 )
+
+
+
+
+; read-line ->  procedimiento para leer una línea del archivo file.
+; 'any -> Indica que cualquier valor válido (incluido el EOF, es decir, el final del archivo) es aceptado como una línea.
+; begin -> Para agrupar múltiples expresiones en secuencia y especificar que todas las expresiones deben evaluarse en orden
+(define (readFilePerLine file)
+  (let ((line (read-line file 'any)))
+    (if (not (eof-object? line))
+      (begin
+       (readLinePerSpaces line)
+       (readFilePerLine file)
+       )
+      (displayln "FIN ARCHIVO")
+     )
+   )
+ )
+
+; Funcion recibe un string y regresa el string sin el primer caracter
+(define (removeFirstChar str)
+      (substring str 1 (string-length str))
+ )
+
+; Funcion recibe unstring y regresa un string del primer caracter
+(define (getFirstChar str)
+  (if (> (string-length str) 0)
+      (string (string-ref str 0))
+      ""
+  )
+  )
+
+
+(define (readLinePerSpacesXXX line)
+  (if (char=? (getFirstChar line) #\space)
+      (displayln "Espacio reconocido")
+      (displayln "Espacio no reconocido")
+
+      )
+  )
+
+(define (readLinePerSpaces line)
+  (define (readLinePerSpaces_tr line word_ac)
+     (if (> (string-length line) 0)
+         (
+          if (not (string=? (getFirstChar line) " "))
+                                            ( ; Si no es el fin de la linea, sumalo
+                                                readLinePerSpaces_tr (removeFirstChar line) (string-append word_ac (getFirstChar line))
+                                             )
+
+
+                                       (begin ; Si el caracter es un espacio, despliega la palabra y sigue
+                                        (displayln word_ac)
+                                        (readLinePerSpaces_tr (removeFirstChar line) "")
+                                        )
+                                       )
+         (begin
+          (displayln word_ac)
+          (displayln "CAMBIO DE LINEA")
+          )
+
+
+
+          )
+      )
+
+  (readLinePerSpaces_tr line "")
+)
+
+
+
+; call-with-input-file -> procedimiento que toma dos argumentos: el nombre del archivo a abrir y la función a ejecutar. e encarga de abrir el archivo, pasar el objeto de archivo a la función y asegurarse de que el archivo se cierre adecuadamente una vez que se completa la ejecución de la función.
+(call-with-input-file "InputFile.txt" readFilePerLine)
 
 
 
