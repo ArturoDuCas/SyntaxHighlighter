@@ -160,41 +160,68 @@
 
 
 (define (readLinePerSpaces line)
-  (define (readLinePerSpaces_tr line word_ac)
-     (if (> (string-length line) 0)
+  (define (readLinePerSpaces_tr line word_ac isComment)
+    (cond
+      [isComment 
+                    (if (> (string-length line) 0)
+                        (readLinePerSpaces_tr (removeFirstChar line) (string-append word_ac (getFirstChar line)) #t)
+                        (
+                         (token_writer word_ac)
+                         (write_break)
+                         )
+                     )
+                    
+       ]
+      [#t  
+(if (> (string-length line) 0)
          (
           if (not (string=? (getFirstChar line) " "))
-                                            ( ; Si no es el fin de la linea, sumalo
-                                                readLinePerSpaces_tr (removeFirstChar line) (string-append word_ac (getFirstChar line))
+                                            ( 
+                                              if (string=? (getFirstChar line) "#")
+                                                (begin
+                                                   (token_writer word_ac)
+                                                   (readLinePerSpaces_tr (removeFirstChar line) "#" #t)
+                                                 )
+                                                 (
+                                                     readLinePerSpaces_tr (removeFirstChar line) (string-append word_ac (getFirstChar line)) #f
+                                                  )
                                              )
 
 
                                        (begin ; Si el caracter es un espacio
-                                         (displayln word_ac)
-                                         (if (> (string-length word_ac) 0)
-                                         (begin ; Si el acumulador esta cargado
-                                          (token_writer word_ac)
-                                          (write_space)
-                                          )
-                                         ( ; Si el acumulador no tiene nada
-                                          write_space
-                                          )
+                                         (
+                                           if (> (string-length word_ac) 0)
+                                              ( ; Si el acumulador esta cargado
+                                                 begin 
+                                                 (token_writer word_ac)
+                                                 (write_space)
+                                               )
+
+                                              ( ; Si el acumulador no tiene nada
+                                                  write_space
+                                               )
                                          )
-                                        (readLinePerSpaces_tr (removeFirstChar line) "")
+
+                                         (readLinePerSpaces_tr (removeFirstChar line) "" #f)
                                        )
                                        )
+         
                                        
          (begin
           (token_writer word_ac)
           (write_break)
           )
 
+             )
+  ]
+      )
+
+    
+
 
 
           )
-      )
-
-  (readLinePerSpaces_tr line "")
+  (readLinePerSpaces_tr line "" #f)
 )
 
 
