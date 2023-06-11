@@ -7,7 +7,7 @@
     '("False" "None" "True" "and" "as" "assert" "async" "await" "break" "class"
       "continue" "def" "del" "elif" "else" "except" "finally" "for" "from"
       "global" "if" "import" "in" "is" "lambda" "nonlocal" "not" "or" "pass"
-      "raise" "return" "try" "while" "with" "yield"))
+      "raise" "return" "try" "while" "with" "yield" ))
   (member str palabras-reservadas))
 
 (define (filestart)
@@ -83,42 +83,51 @@
     (lambda ()
       (write-string texto))))
 
+;Limpiar el archivo en el que se crea el html
+(define (borrar_contenido)
+  (call-with-output-file output-file
+    #:mode 'text
+    #:exists 'truncate
+    (lambda (output-port)
+      '())))
+
 ;Escribir una etiqueta para cada token
 (define (write-tag token class)
-  (write-text "<p class=\"")
-  (write-text class)
-  (write-text "\">")
-  (write-text token)
-  (write-text "</p>")
+  (if (equal? class "-") (display ".")(begin
+                                        (write-text "<p class=\"")
+                                        (write-text class)
+                                        (write-text "\">")
+                                        (write-text token)
+                                        (write-text "</p>")
+                                       )
+  
+      )
   )
 
-(define (token_writer token)
-  ;Identificamos el tipo de token
-  (define (token_evaluator token)
-    (cond
-      [(verificar-palabra-reservada? token) "reserved" ]
-      [(regexp-match? #px"^[a-zA-Z][_a-zA-Z0-9]*$" token)  "var" ]
-      [(regexp-match? #px"^-?\\d+$" token)  "literal"]
-      [(regexp-match? #px"^[0-9]+\\.[0-9]*$" token) "literal"]
-      [(regexp-match? #px"^\".*\"$" token) "string"]
-      [(regexp-match? #px"^\'.*\'$" token) "string"]
-      [(regexp-match? #px"^#.*n*$" token) "comment"]
-      [(regexp-match? #px"^[+\\-*//%=<>!&|^]$" token) "operator"]
-      [(regexp-match? #px"^[\\[\\]\\{\\}\\(\\)]+$" token) "delimiter"]
-      ["error"]
-      ))
+;Identificamos el tipo de token
+(define (token_evaluator token)
+  (cond
+    ;Casos especiales
+    [(regexp-match? #px"[([{].+" token) (begin (write-tag (string (string-ref token 0)) "delimiter")(token_writer (substring token 1))) "-"]
+    [(regexp-match? #px".*[\\]}):,]$" token) (begin (token_writer (substring token 0 (- (string-length token) 1))) (write-tag  (substring token (- (string-length token) 1)) "delimiter")) "-"]
+    [(regexp-match? #px".*([+\\-*\\/\\%=<>!&|^:]|\\+=|-=|\\*=|/=|//=|%=|\\*\\*=|//|\\*\\*|==|!=|>|<|>=|<=)$" token) (begin (token_writer (substring token 0 (- (string-length token) 1))) (write-tag  (substring token (- (string-length token) 1)) "operator")) "-"]
+    [(regexp-match? #px"^(\\+=|-=|\\*=|/=|//=|%=|\\*\\*=|//|\\*\\*|==|!=|>|<|>=|<=|[+\\-*\\/\\%=<>!&|^:])\\S*$" token) (begin (write-tag (string (string-ref token 0)) "operator")(token_writer (substring token 1))) "-"]
+    [(verificar-palabra-reservada? token) "reserved" ]
+    ;Casos regulares
+    [(regexp-match? #px"^[a-zA-Z][_a-zA-Z0-9]*$" token)  "var" ]
+    [(regexp-match? #px"^-?\\d+$" token)  "literal"]
+    [(regexp-match? #px"^[0-9]+\\.[0-9]*$" token) "literal"]
+    [(regexp-match? #px"^\".*\"$" token) "string"]
+    [(regexp-match? #px"^\'.*\'$" token) "string"]
+    [(regexp-match? #px"^#.*n*$" token) "comment"]
+    [(regexp-match? #px"^(\\+=|-=|\\*=|/=|//=|%=|\\*\\*=|//|\\*\\*|==|!=|>|<|>=|<=|[+\\-*//%=<>!&|^:])$" token) "operator"]
+    [(regexp-match? #px"^[\\[\\]\\{\\}\\(\\)]+$" token) "delimiter"]
+    ["error"]
+    ))
 
-  ;Escribir una etiqueta para cada token
-  (define (write-tag token class)
-    (write-text "<p class=\"")
-    (write-text class)
-    (write-text "\">")
-    (write-text token)
-    (write-text "</p>")
-    )
-  
+(define (token_writer token)
   (write-tag token (token_evaluator token))
-)
+  )
 
 ; Imprimir un salto de linea
 (define (write_break)
@@ -129,7 +138,6 @@
 (define (write_space)
   (write-text "<p>&nbsp&nbsp;<p>")
   )
-
 
 
 
@@ -153,7 +161,7 @@
       (substring str 1 (string-length str))
  )
 
-; Funcion recibe unstring y regresa un string del primer caracter
+; Funcion recibe un string y regresa un string del primer caracter
 (define (getFirstChar str)
       (string (string-ref str 0))
   )
@@ -261,7 +269,8 @@
 
 
 
-
+;Limpiamos el contenido de nuestro archivo
+(borrar_contenido)
 
 ;Escribimos las reglas de css y las etiquetas de apertura de html
 (write-text (filestart))
