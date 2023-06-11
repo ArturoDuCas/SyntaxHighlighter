@@ -1,0 +1,17 @@
+def errorDetector (actual, next, token, char):
+    numbersNotValid = {8, 9, 13, 14}
+    if (actual == 7 and next == 17): # Variable no empieza con letra 
+        return True 
+    if (actual in numbersNotValid and next not in numbers): # Error en numeros 
+        print (token, "-> Numero no valido")
+        return True
+    if (next == 20): # Se va a mover al estado de error 
+        print (token + char , " -> Expresion no valida! ")
+        return True
+
+    else: 
+        return False
+        
+
+int uno 
+string texto largo = " jijiji un texto "
