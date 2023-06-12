@@ -1,0 +1,26 @@
+def calcular_media(numeros):
+    # Palabras reservadas: def, return
+    # Tipos de datos: list, float
+    # Operaciones: len, sum
+
+    if len(numeros) == 0:
+        return None
+
+    total = sum(numeros)
+    media = float(total) / len(numeros)
+
+    # Palabras reservadas: if, else, print
+    # Operaciones: >, <=
+    if media > 10:
+        evaluado = "La media es mayor que 10"
+    else:
+        evaluado = "La media es menor o igual que 10"
+
+    return media
+
+# Ejemplo de uso
+numeros = [5, 10, 15, 20]
+resultado = calcular_media(numeros)
+
+var_2 = 6 +5 /3 -2 4* 5%
+var_3 = 6+ 5 -4 / 2 * 7
