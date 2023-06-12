@@ -1,0 +1,6 @@
+def calcular_factorial(n):
+    12_variableMal = 1
+    for i in range(1, n + 1):
+        factorial *= i
+    print("ups no se cerro este string
+    #ups comente mal return factorial
